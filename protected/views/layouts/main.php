@@ -10,6 +10,7 @@
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl.'/css'; ?>/brain/css/brain-theme.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl.'/css'; ?>/brain/css/styles.css">
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl.'/css'; ?>/brain/css/font-awesome.min.css">
+    <script type="text/javascript" src="<?php echo Yii::app()->request->baseUrl.'/css'; ?>/brain/js/jquery-1.11.1.min.js"></script>
 
 	<title><?php echo CHtml::encode(Yii::app()->name); ?></title>
 </head>
@@ -45,7 +46,7 @@
 								'items'=>array(
 										array(
 											'label'=>'<i class="fa fa-mail-forward"></i> Logout</a>',
-											'url'=>array('/'.Yii::app()->controller->module->id.'/default/logout'),
+											'url'=>array('/site/logout'),
 											'visible'=>!Yii::app()->user->isGuest
 										),
 									),
@@ -95,20 +96,24 @@
 <div class="container-fluid">
 	<div class="page-header">
             <div class="logo">
-				<?php echo CHtml::link(CHtml::image(Yii::app()->request->baseUrl.'/images/'.Yii::app()->params['logo']),array('/'.Yii::app()->controller->module->id.'/default'));?>
+				<?php echo CHtml::link(CHtml::image(Yii::app()->request->baseUrl.'/images/'.Yii::app()->params['logo']),array('/'));?>
 			</div>
 			<?php if(!Yii::app()->user->isGuest):?>
             <ul class="middle-nav">
-                <li><a href="<?php echo Yii::app()->createUrl('/'.Yii::app()->controller->module->id.'/reports/view');?>" class="btn btn-default"><i class="fa fa-bar-chart-o"></i> <span><?php echo Yii::t('order','Statistic');?></span></a></li>
                 <li>
-					<a href="<?php echo Yii::app()->createUrl('/'.Yii::app()->controller->module->id.'/invoices/view');?>" class="btn btn-default">
-						<i class="fa fa-money"></i> <span><?php echo Yii::t('order','List Invoices');?></span>
+                    <a href="<?php echo Yii::app()->createUrl('/statistik/view');?>" class="btn btn-default">
+                        <i class="fa fa-bar-chart-o"></i> <span>Statistik</span>
+                    </a>
+                </li>
+                <li>
+					<a href="<?php echo Yii::app()->createUrl('/invoices/admin');?>" class="btn btn-default">
+						<i class="fa fa-money"></i> <span>Daftar Transaksi</span>
 					</a>
 					<div class="label label-info"><?php //echo Invoice::getTotalPaid();?></div>
 				</li>
 				<li>
-					<a href="<?php echo Yii::app()->createUrl('/'.Yii::app()->controller->module->id.'/orders/create');?>" class="btn btn-default">
-						<i class="fa fa-briefcase"></i> <span><?php echo Yii::t('order','New Transaction');?></span>
+					<a href="<?php echo Yii::app()->createUrl('/');?>" class="btn btn-default">
+						<i class="fa fa-briefcase"></i> <span>Transaksi Baru</span>
 					</a>
 				</li>
             </ul>

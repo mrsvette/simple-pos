@@ -10,24 +10,9 @@
 *
 * ======================================================== */
 if (window.addEventListener){ // W3C standard
-	window.addEventListener('load', loadJquery, false); // NB **not** 'onload'
 	window.addEventListener('load', initApplication, false);
 }else if (window.attachEvent){ // Microsoft
-	window.attachEvent('onload', loadJquery);
 	window.attachEvent('onload', initApplication);
-}
-function loadJquery(){
-	if(typeof jQuery=='undefined'){
-		var token = document.querySelector('script[id="app-js"]').getAttribute('src');
-		var base = token.split('/application.js');
-		(function(){
-			var scr = document.createElement("script");
-			scr.type = "text/javascript";
-			scr.src = base[0]+'/jquery-1.11.1.min.js';
-			//scr.setAttribute('async', 'true');
-			((document.getElementsByTagName('head') || [null])[0] || document.getElementsByTagName('script')[0].parentNode).appendChild(scr);
-		}());
-	}
 }
 function initApplication(){
 	$(function() {
