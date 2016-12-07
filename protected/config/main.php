@@ -85,5 +85,8 @@ return array(
     'params' => array(
         // this is used in contact page
         'logo' => 'logo.png',
+        'struk_logo' => 'struk-logo.png',
+        'alamat' => 'Jl. Palagan Km 5, Sleman, DIY',
+        'thanks_note' => 'Terimakasih, Selamat belanja kembali.',
     ),
 );

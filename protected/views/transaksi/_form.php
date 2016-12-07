@@ -13,7 +13,7 @@
 			</div>
 			<div class="col-md-7 col-sm-6 text-right">
 				<button class="btn btn-default mar_top1" onclick="listItems();">Pencarian lebih lanjut</button>
-				<div class="col-md-4 row">
+				<div class="col-md-4 row hide">
 					<?php echo CHtml::dropDownList('currency', 'Rupiah', array('Rupiah'),array('class'=>'form-control','onchange'=>'setCurrency(this);'));?>
 				</div>
 			</div>

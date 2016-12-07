@@ -32,7 +32,7 @@ class TagihanController extends Controller
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update'),
+                'actions' => array('create', 'update', 'printPreview'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -139,6 +139,22 @@ class TagihanController extends Controller
         $this->render('admin', array(
             'model' => $model,
         ));
+    }
+
+    public function actionPrintPreview($id)
+    {
+        if (Yii::app()->request->isPostRequest) {
+            $model = Tagihan::model()->findByPk($id);
+            $print = false;
+            if (isset($_POST['new_order']))
+                $print = true;
+            echo CJSON::encode(array(
+                'status' => 'success',
+                'div' => $this->renderPartial('_print_preview', array('model' => $model, 'print' => $print), true, true),
+                'invoice_number' => $model->nomor_tagihan,
+            ));
+            exit;
+        }
     }
 
     /**
