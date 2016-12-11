@@ -20,11 +20,11 @@ return array(
 
     'modules' => array(
         // uncomment the following to enable the Gii tool
-        'gii'=>array(
-            'class'=>'system.gii.GiiModule',
-            'password'=>'123456',
+        'gii' => array(
+            'class' => 'system.gii.GiiModule',
+            'password' => '123456',
             // If removed, Gii defaults to localhost only. Edit carefully to taste.
-            'ipFilters'=>array('127.0.0.1','::1'),
+            'ipFilters' => array('127.0.0.1', '::1'),
         ),
     ),
 
@@ -37,12 +37,13 @@ return array(
         ),
 
         // uncomment the following to enable URLs in path-format
-        'urlManager'=>array(
-            'urlFormat'=>'path',
-            'rules'=>array(
-                '<controller:\w+>/<id:\d+>'=>'<controller>/view',
-                '<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
-                '<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
+        'urlManager' => array(
+            'urlFormat' => 'path',
+            'showScriptName'=>false,
+            'rules' => array(
+                '<controller:\w+>/<id:\d+>' => '<controller>/view',
+                '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
+                '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
             ),
         ),
 
@@ -83,6 +84,9 @@ return array(
     // using Yii::app()->params['paramName']
     'params' => array(
         // this is used in contact page
-        'adminEmail' => 'webmaster@example.com',
+        'logo' => 'logo.png',
+        'struk_logo' => 'struk-logo.png',
+        'alamat' => 'Jl. Palagan Km 5, Sleman, DIY',
+        'thanks_note' => 'Terimakasih, Selamat belanja kembali.',
     ),
 );

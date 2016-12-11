@@ -47,6 +47,9 @@ class DetailTagihan extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'tagihan_rel' => array(self::BELONGS_TO,'Tagihan','id_tagihan'),
+			'produk_rel' => array(self::BELONGS_TO,'Produk','id_produk'),
+			'promosi_rel' => array(self::BELONGS_TO,'Promosi','id_promosi'),
 		);
 	}
 
