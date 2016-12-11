@@ -1,36 +1,31 @@
 <?php
 $this->breadcrumbs=array(
-	Yii::t('order','Orders')=>array('view'),
-	Yii::t('global','Create'),
+	'Transaksi' => array('view'),
+	'Ubah Data',
 );
 
 $this->menu=array(
 	array(
-		'label'=>Yii::t('global','List').' '.Yii::t('order','Orders'), 
-		'url'=>array('view'),
-		'visible'=>RbacUserAccess::isChecked(Yii::app()->controller->module->id,'orders',Yii::app()->user->id,'read_p')
+		'label'=>Yii::t('global','List').' '.Yii::t('order','tagihan'), 
+		'url'=>array('tagihan/view'),
+		'visible'=>UserAccess::hasAccess('tagihan',Yii::app()->user->id,'read')
 	),
 	array(
-		'label'=>Yii::t('global','List').' '.Yii::t('order','Invoices'), 
-		'url'=>array('invoices/view'),
-		'visible'=>RbacUserAccess::isChecked(Yii::app()->controller->module->id,'invoices',Yii::app()->user->id,'read_p')
+		'label'=>Yii::t('global','List').' '.Yii::t('order','produk'), 
+		'url'=>array('produk/view'),
+		'visible'=>UserAccess::hasAccess('produk',Yii::app()->user->id,'read')
 	),
 	array(
-		'label'=>Yii::t('global','List').' '.Yii::t('order','Products'), 
-		'url'=>array('products/view'),
-		'visible'=>RbacUserAccess::isChecked(Yii::app()->controller->module->id,'products',Yii::app()->user->id,'read_p')
-	),
-	array(
-		'label'=>Yii::t('global','List').' '.Yii::t('order','Promotions'), 
-		'url'=>array('promotions/view'),
-		'visible'=>RbacUserAccess::isChecked(Yii::app()->controller->module->id,'promotions',Yii::app()->user->id,'read_p')
+		'label'=>Yii::t('global','List').' '.Yii::t('order','promosi'), 
+		'url'=>array('promosi/view'),
+		'visible'=>UserAccess::hasAccess('promosi',Yii::app()->user->id,'read')
 	),
 );
 ?>
 
 <div class="panel panel-default">
 	<div class="panel-heading">
-		<h4 class="panel-title"><i class="fa fa-briefcase"></i> <?php echo Yii::t('order','Create Sales');?></h4>
+		<h4 class="panel-title"><i class="fa fa-briefcase"></i> Ubah Transaksi</h4>
 	</div>
 	<div class="panel-body">
 		<?php echo $this->renderPartial('_form', array('model'=>$model,'promocode'=>$promocode)); ?>

@@ -101,12 +101,7 @@
 			<?php if(!Yii::app()->user->isGuest):?>
             <ul class="middle-nav">
                 <li>
-                    <a href="<?php echo Yii::app()->createUrl('/statistik/view');?>" class="btn btn-default">
-                        <i class="fa fa-bar-chart-o"></i> <span>Statistik</span>
-                    </a>
-                </li>
-                <li>
-					<a href="<?php echo Yii::app()->createUrl('/invoices/admin');?>" class="btn btn-default">
+					<a href="<?php echo Yii::app()->createUrl('/tagihan/view');?>" class="btn btn-default">
 						<i class="fa fa-money"></i> <span>Daftar Transaksi</span>
 					</a>
 					<div class="label label-info"><?php //echo Invoice::getTotalPaid();?></div>

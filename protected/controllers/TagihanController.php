@@ -28,15 +28,15 @@ class TagihanController extends Controller
     {
         return array(
             array('allow',  // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'view'),
-                'users' => array('*'),
+                'actions' => array('view'),
+                'users' => array('@'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update', 'printPreview'),
+                'actions' => array('update', 'printPreview', 'refund'),
                 'users' => array('@'),
             ),
             array('allow', // allow admin user to perform 'admin' and 'delete' actions
-                'actions' => array('admin', 'delete'),
+                'actions' => array('delete', 'deleteItem'),
                 'users' => array('@'),
             ),
             array('deny',  // deny all users
@@ -45,14 +45,46 @@ class TagihanController extends Controller
         );
     }
 
-    /**
-     * Displays a particular model.
-     * @param integer $id the ID of the model to be displayed
-     */
-    public function actionView($id)
+    public function actionView()
     {
+        $criteria1 = new CDbCriteria;
+        $criteria2 = new CDbCriteria;
+        $criteria3 = new CDbCriteria;
+        $criteria4 = new CDbCriteria;
+        if (isset($_GET['Tagihan'])) {
+            $criteria1->compare('id_pelanggan', $_GET['Tagihan']['id_pelanggan']);
+            $criteria1->compare('id', $_GET['Tagihan']['id']);
+            $criteria1->addBetweenCondition('DATE_FORMAT(tanggal_input,"%Y-%m-%d")', $_GET['Tagihan']['date_from'], $_GET['Tagihan']['date_to'], 'AND');
+            $criteria2->compare('id_pelanggan', $_GET['Tagihan']['id_pelanggan']);
+            $criteria2->compare('id', $_GET['Tagihan']['id']);
+            $criteria2->addBetweenCondition('DATE_FORMAT(tanggal_input,"%Y-%m-%d")', $_GET['Tagihan']['date_from'], $_GET['Tagihan']['date_to'], 'AND');
+            $criteria3->compare('id_pelanggan', $_GET['Tagihan']['id_pelanggan']);
+            $criteria3->compare('id', $_GET['Tagihan']['id']);
+            $criteria3->addBetweenCondition('DATE_FORMAT(tanggal_input,"%Y-%m-%d")', $_GET['Tagihan']['date_from'], $_GET['Tagihan']['date_to'], 'AND');
+            $criteria4->compare('id_pelanggan', $_GET['Tagihan']['id_pelanggan']);
+            $criteria4->compare('id', $_GET['Tagihan']['id']);
+            $criteria4->addBetweenCondition('DATE_FORMAT(tanggal_input,"%Y-%m-%d")', $_GET['Tagihan']['date_from'], $_GET['Tagihan']['date_to'], 'AND');
+        }
+        $criteria1->order = 'tanggal_input DESC';
+        $dataProvider = new CActiveDataProvider('Tagihan', array('criteria' => $criteria1));
+
+        $criteria2->compare('status_tagihan', Tagihan::STATUS_UNPAID);
+        $criteria2->order = 'tanggal_input DESC';
+        $unpaidProvider = new CActiveDataProvider('Tagihan', array('criteria' => $criteria2));
+
+        $criteria3->compare('status_tagihan', Tagihan::STATUS_PAID);
+        $criteria3->order = 'tanggal_input DESC';
+        $paidProvider = new CActiveDataProvider('Tagihan', array('criteria' => $criteria3));
+
+        $criteria4->compare('status_tagihan', Tagihan::STATUS_REFUND);
+        $criteria4->order = 'tanggal_input DESC';
+        $refundProvider = new CActiveDataProvider('Tagihan', array('criteria' => $criteria4));
+
         $this->render('view', array(
-            'model' => $this->loadModel($id),
+            'dataProvider' => $dataProvider,
+            'unpaidProvider' => $unpaidProvider,
+            'paidProvider' => $paidProvider,
+            'refundProvider' => $refundProvider,
         ));
     }
 
@@ -92,12 +124,19 @@ class TagihanController extends Controller
 
         if (isset($_POST['Tagihan'])) {
             $model->attributes = $_POST['Tagihan'];
-            if ($model->save())
-                $this->redirect(array('view', 'id' => $model->id));
+            if ($model->save()){
+                Yii::app()->user->setFlash('update', 'Data tegihan telah berhasil diubah.');
+                $this->refresh();
+            }
         }
+
+        $criteria = new CDbCriteria;
+        $criteria->compare('id_tagihan',$model->id);
+        $itemsProvider = new CActiveDataProvider('DetailTagihan',array('criteria'=>$criteria));
 
         $this->render('update', array(
             'model' => $model,
+            'itemsProvider' => $itemsProvider
         ));
     }
 
@@ -108,38 +147,32 @@ class TagihanController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->loadModel($id)->delete();
+        $model = Tagihan::model()->findByPk($id);
+        if($model->delete()){
+            DetailTagihan::model()->deleteAllByAttributes(array('id_tagihan'=>$id));
+        }
 
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
         if (!isset($_GET['ajax']))
             $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
     }
 
-    /**
-     * Lists all models.
-     */
-    public function actionIndex()
+    public function actionDeleteItem($id)
     {
-        $dataProvider = new CActiveDataProvider('Tagihan');
-        $this->render('index', array(
-            'dataProvider' => $dataProvider,
-        ));
+        if(Yii::app()->request->isPostRequest)
+        {
+            // we only allow deletion via POST request
+            $model = DetailTagihan::model()->findByPk($id);
+            $model->delete();
+
+            // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+            if(!isset($_GET['ajax']))
+                $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('view'));
+        }
+        else
+            throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
     }
 
-    /**
-     * Manages all models.
-     */
-    public function actionAdmin()
-    {
-        $model = new Tagihan('search');
-        $model->unsetAttributes();  // clear any default values
-        if (isset($_GET['Tagihan']))
-            $model->attributes = $_GET['Tagihan'];
-
-        $this->render('admin', array(
-            'model' => $model,
-        ));
-    }
 
     public function actionPrintPreview($id)
     {
@@ -151,9 +184,25 @@ class TagihanController extends Controller
             echo CJSON::encode(array(
                 'status' => 'success',
                 'div' => $this->renderPartial('_print_preview', array('model' => $model, 'print' => $print), true, true),
-                'invoice_number' => $model->nomor_tagihan,
+                'Tagihan_number' => $model->nomor_tagihan,
             ));
             exit;
+        }
+    }
+
+    public function actionRefund($id)
+    {
+        if(Yii::app()->request->isPostRequest)
+        {
+            $model = $this->loadModel($id);
+            $model->status_tagihan = Tagihan::STATUS_REFUND;
+            if($model->save()){
+                echo CJSON::encode(array(
+                    'status' => 'success',
+                    'div' => Tagihan::STATUS_REFUND,
+                ));
+                exit;
+            }
         }
     }
 

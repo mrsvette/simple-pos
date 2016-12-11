@@ -144,17 +144,16 @@ class TransaksiController extends Controller
                 $cart_discount = $items_belanja[$id]['discount'] / $items_belanja[$id]['qty'];
                 $items_belanja[$id]['qty'] = (int)$_POST['qty'];
                 $model = Produk::model()->findByPk($items_belanja[$id]['id']);
-                if ((int)$_POST['qty'] <= (int)$model->price->current_stock) { //jika kurang dari atau sm dengan persediaan
-                    $price = 0;
-                    if ($model->discount_rel_count > 0) {
+                $price = 0;
+                    if ($model->diskon_rel_count > 0) {
                         foreach ($model->getDiscontedItems() as $index => $data) {
-                            if ($data->quantity <= 0)
-                                $data->quantity = 1;
-                            $bagi = $items_belanja[$id]['qty'] / $data->quantity;
-                            $mod = $items_belanja[$id]['qty'] % $data->quantity;
-                            if (((int)$bagi > 0) & ($bagi <= $data->quantity)) {
-                                if (time() >= strtotime($data->date_start) && time() <= strtotime($data->date_end)) {
-                                    $price = (int)$bagi * $data->price;
+                            if ($data->jumlah_produk <= 0)
+                                $data->jumlah_produk = 1;
+                            $bagi = $items_belanja[$id]['qty'] / $data->jumlah_produk;
+                            $mod = $items_belanja[$id]['qty'] % $data->jumlah_produk;
+                            if (((int)$bagi > 0) & ($bagi <= $data->jumlah_produk)) {
+                                if (time() >= strtotime($data->tanggal_mulai_diskon) && time() <= strtotime($data->tanggal_berakhir_diskon)) {
+                                    $price = (int)$bagi * $data->harga_produk;
                                     if ($mod > 0)
                                         $price = $price + $items_belanja[$id]['unit_price'] * $mod;
                                     $items_belanja[$id]['discount'] = ($items_belanja[$id]['unit_price'] * $items_belanja[$id]['qty']) - $price;
@@ -162,9 +161,9 @@ class TransaksiController extends Controller
                             }
                         }
                     } else {
-                        $price = $model->price->sold_price * $_POST['qty'];
+                        $price = $model->harga_produk * $_POST['qty'];
                         if (Yii::app()->user->hasState('promocode'))
-                            $items_belanja[$id]['discount'] = Promo::getDiscountValue(Yii::app()->user->getState('promocode'), $price);
+                            $items_belanja[$id]['discount'] = Promosi::getDiscountValue(Yii::app()->user->getState('promocode'), $price);
                     }
                     Yii::app()->user->setState('items_belanja', $items_belanja);
                     if ($price > 0)
@@ -181,12 +180,6 @@ class TransaksiController extends Controller
                         'subtotal' => number_format($this->getTotalBelanja(), 0, ',', '.'),
                         'discount' => number_format($discount, 0, ',', '.'),
                     ));
-                } else {
-                    echo CJSON::encode(array(
-                        'status' => 'failed',
-                        'message' => $_POST['qty'] . ' is not allowed, max ' . $model->price->current_stock . ' ready stock.',
-                    ));
-                }
                 exit;
             }
         }
@@ -215,8 +208,89 @@ class TransaksiController extends Controller
 
                     $model2->tanggal_input = date(c);
                     $model2->user_input = Yii::app()->user->id;
+                    $model2->config=CJSON::encode(
+                        array(
+                            'items_belanja' => Yii::app()->user->getState('items_belanja'),
+                            'items_payment' => Yii::app()->user->getState('items_payment'),
+                            'customer' => Yii::app()->user->getState('customer'),
+                            'promocode' => Yii::app()->user->getState('promocode'),
+                        )
+                    );
                     if ($model2->save()) {
                         $invoice_id = $model2->id;
+                        foreach (Yii::app()->user->getState('items_belanja') as $index => $data) {
+                            $model3 = new DetailTagihan;
+                            $model3->id_produk = $data['id'];
+                            $model3->id_tagihan = $model2->id;
+                            $model3->jumlah = $data['qty'];
+                            $model3->harga = $data['unit_price'];
+                            $model3->diskon = $data['discount'];
+                            if (Yii::app()->user->hasState('promocode')) {
+                                $model3->id_promosi = Yii::app()->user->getState('promocode');
+                                $model3->diskon = Promosi::getDiscountValue(Yii::app()->user->getState('promocode'), $model3->harga);
+                            }
+                            $model3->save();
+                        }
+                        Yii::app()->user->setState('items_belanja', null);
+                        Yii::app()->user->setState('items_payment', null);
+                        Yii::app()->user->setState('customer', null);
+                        Yii::app()->user->setState('promocode', null);
+                    }
+                    //add queue for analytics
+                    /*if (Order::hasAnalyticConfig()) {
+                        $queue = new Queue;
+                        $queue->invoice_id = $invoice_id;
+                        $queue->date_entry = date(c);
+                        $queue->user_entry = Yii::app()->user->id;
+                        $queue->save();
+                    }*/
+
+                    echo CJSON::encode(array(
+                        'status' => 'success',
+                        'invoice_id' => $invoice_id,
+                    ));
+                    exit;
+                }
+            }
+            echo CJSON::encode(array(
+                'status' => 'success',
+                'div' => $this->renderPartial('_payment', array('model' => $model, 'id' => $_POST['id']), true, true),
+            ));
+            exit;
+        }
+    }
+
+    public function actionPaymentRequestUpdate($id)
+    {
+        if (Yii::app()->request->isAjaxRequest) {
+            // Stop jQuery from re-initialization
+            //Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+            //Yii::app()->clientScript->scriptMap['jquery.min.js'] = false;
+
+            $model = new PaymentForm;
+            if (isset($_POST['PaymentForm'])) {
+                if (Yii::app()->user->hasState('items_belanja')) {
+                    $model2 = Tagihan::model()->findByPk($id);
+                    if (Yii::app()->user->hasState('customer')) {
+                        $customer = Yii::app()->user->getState('customer');
+                        $model2->id_pelanggan = (!empty($customer)) ? $customer->id : 0;
+                    }
+                    $model2->status_tagihan = Tagihan::STATUS_PAID;
+                    $model2->total_tagihan = $this->money_unformat($_POST['PaymentForm']['amount_tendered']);
+                    if ($model2->status_tagihan == Tagihan::STATUS_PAID)
+                        $model2->tanggal_pembayaran = date(c);
+
+                    $model2->config=CJSON::encode(
+                        array(
+                            'items_belanja' => Yii::app()->user->getState('items_belanja'),
+                            'items_payment' => Yii::app()->user->getState('items_payment'),
+                            'customer' => Yii::app()->user->getState('customer'),
+                            'promocode' => Yii::app()->user->getState('promocode'),
+                        )
+                    );
+                    if ($model2->save()) {
+                        $invoice_id = $model2->id;
+                        $del = DetailTagihan::model()->deleteAllByAttributes(array('id_tagihan'=>$invoice_id));
                         foreach (Yii::app()->user->getState('items_belanja') as $index => $data) {
                             $model3 = new DetailTagihan;
                             $model3->id_produk = $data['id'];
@@ -497,21 +571,6 @@ class TransaksiController extends Controller
         $this->render('update', array('model' => $model));
     }
 
-    public function actionChange($id)
-    {
-        $model = Invoice::model()->findByPk($id);
-        $config = CJSON::decode($model->config);
-        foreach ($config as $index => $data) {
-            Yii::app()->user->setState($index, $data);
-        }
-        Yii::app()->user->setState('currency', $model->currency_id);
-        $this->render('change', array(
-            'model' => $model,
-            'promocode' => Yii::app()->user->getState('promocode'),
-            'customer' => $config['customer']['id'] . ' - ' . $config['customer']['name']
-        ));
-    }
-
     public function actionCreateDiscount()
     {
         if (Yii::app()->request->isAjaxRequest) {
@@ -570,88 +629,19 @@ class TransaksiController extends Controller
         }
     }
 
-    public function actionPaymentRequestUpdate($id)
+    public function actionChange($id)
     {
-        if (Yii::app()->request->isAjaxRequest) {
-            // Stop jQuery from re-initialization
-            Yii::app()->clientScript->scriptMap['jquery.js'] = false;
-            Yii::app()->clientScript->scriptMap['jquery.min.js'] = false;
-
-            $model = new PaymentForm;
-            if (isset($_POST['PaymentForm'])) {
-                if (Yii::app()->user->hasState('items_belanja')) {
-                    $model2 = Invoice::model()->findByPk($id);
-                    if (Yii::app()->user->hasState('customer')) {
-                        $customer = Yii::app()->user->getState('customer');
-                        $model2->customer_id = (!empty($customer)) ? $customer->id : 0;
-                    }
-                    $model2->status = 1;
-                    $model2->config = CJSON::encode(
-                        array(
-                            'items_belanja' => Yii::app()->user->getState('items_belanja'),
-                            'items_payment' => Yii::app()->user->getState('items_payment'),
-                            'customer' => Yii::app()->user->getState('customer'),
-                            'promocode' => Yii::app()->user->getState('promocode'),
-                        )
-                    );
-                    $model2->currency_id = Yii::app()->user->getState('currency');
-                    $model2->change_value = Currency::getChangeValue($model2->currency_id);
-                    $model2->date_update = date(c);
-                    $model2->user_update = Yii::app()->user->id;
-                    if ($model2->save()) {
-                        $invoice_id = $model2->id;
-                        $group_id = Order::getNextGroupId();
-                        $del = Order::model()->deleteAllByAttributes(array('invoice_id' => $invoice_id));
-                        $del2 = InvoiceItem::model()->deleteAllByAttributes(array('invoice_id' => $invoice_id));
-                        foreach (Yii::app()->user->getState('items_belanja') as $index => $data) {
-                            $model3 = new Order;
-                            $model3->Produk_id = $data['id'];
-                            $model3->customer_id = $model2->customer_id;
-                            $Produk = Produk::item($model3->Produk_id);
-                            $model3->title = $Produk->name;
-                            $model3->group_id = $group_id;
-                            $model3->group_master = ($index == 0) ? 1 : 0;
-                            $model3->invoice_id = $model2->id;
-                            $model3->quantity = $data['qty'];
-                            //$model3->price=$Produk->price->sold_price;
-                            $model3->price = $data['unit_price'];
-                            $model3->discount = $data['discount'];
-                            if (Yii::app()->user->hasState('promocode')) {
-                                $model3->promo_id = Yii::app()->user->getState('promocode');
-                                $model3->discount = Promo::getDiscountValue(Yii::app()->user->getState('promocode'), $model3->price);
-                            }
-                            $model3->currency_id = $model2->currency_id;
-                            $model3->change_value = $model2->change_value;
-                            $model3->type = $_POST['PaymentForm']['type'];
-                            $model3->status = 1;
-                            $model3->date_entry = date(c);
-                            $model3->user_entry = Yii::app()->user->id;
-                            if ($model3->save()) {
-                                $model4 = new InvoiceItem;
-                                $model4->invoice_id = $model2->id;
-                                $model4->type = 'order';
-                                $model4->rel_id = $model3->id;
-                                $model4->title = $model3->title;
-                                $model4->quantity = $model3->quantity;
-                                $model4->price = $model3->quantity * ($model3->price - $model3->discount);
-                                $model4->date_entry = date(c);
-                                $model4->user_entry = Yii::app()->user->id;
-                                $model4->save();
-                            }
-                        }
-                        Yii::app()->user->setState('items_belanja', null);
-                        Yii::app()->user->setState('items_payment', null);
-                        Yii::app()->user->setState('customer', null);
-                        Yii::app()->user->setState('promocode', null);
-                    }
-                    echo CJSON::encode(array(
-                        'status' => 'success',
-                        'invoice_id' => $invoice_id,
-                    ));
-                    exit;
-                }
-            }
+        $model = Tagihan::model()->findByPk($id);
+        $config = CJSON::decode($model->config);
+        foreach($config as $index=>$data){
+            Yii::app()->user->setState($index,$data);
         }
+
+        $this->render('change',array(
+            'model'=>$model,
+            'promocode'=>Yii::app()->user->getState('promocode'),
+            'customer'=>($model->id_pelanggan>0)? $model->id_pelanggan.' - '.$model->pelanggan_rel->nama_pelanggan : ''
+        ));
     }
 
     public function actionDelete($id)
