@@ -3,9 +3,18 @@
 /* @var $model Produk */
 /* @var $form CActiveForm */
 ?>
-
-<div class="form">
-
+<ul class="nav nav-tabs">
+	<li class="active">
+		<a data-toggle="tab" href="#general">
+			<strong>Informasi Produk</strong>
+		</a>
+	</li>
+	<li class="">
+		<a data-toggle="tab" href="#price">
+			<strong>Harga Diskon</strong>
+		</a>
+	</li>
+</ul>
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'produk-form',
 	// Please note: When you enable ajax validation, make sure the corresponding
@@ -15,50 +24,37 @@
 	'enableAjaxValidation'=>false,
 )); ?>
 
-	<p class="note">Fields with <span class="required">*</span> are required.</p>
+<div class="tab-content pill-content">
+	<div id="general" class="tab-pane active">
+		<?php echo $form->errorSummary($model,null,null,array('class'=>'alert alert-warning alert-block alert-dismissable fade in')); ?>
 
-	<?php echo $form->errorSummary($model); ?>
+		<div class="form-group col-md-4">
+			<?php echo $form->labelEx($model,'nama_produk',array('class'=>'control-label')); ?>
+			<?php echo $form->textField($model,'nama_produk',array('class'=>'form-control')); ?>
+		</div>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'nama_produk'); ?>
-		<?php echo $form->textField($model,'nama_produk',array('size'=>60,'maxlength'=>128)); ?>
-		<?php echo $form->error($model,'nama_produk'); ?>
+		<div class="form-group col-md-4">
+			<?php echo $form->labelEx($model,'jenis_produk',array('class'=>'control-label')); ?>
+			<?php echo $form->dropDownList($model,'jenis_produk',$model->listType,array('class'=>'form-control')); ?>
+		</div>
+		<div class="form-group col-md-4 mb20">
+			<?php echo $form->labelEx($model,'harga_produk',array('class'=>'control-label')); ?>
+			<?php echo $form->textField($model,'harga_produk',array('class'=>'form-control')); ?>
+		</div>
+
+		<div class="form-group col-md-8">
+			<?php echo $form->labelEx($model,'deskripsi_produk',array('class'=>'control-label')); ?>
+			<?php echo $form->textField($model,'deskripsi_produk',array('class'=>'form-control')); ?>
+		</div>
 	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'deskripsi_produk'); ?>
-		<?php echo $form->textArea($model,'deskripsi_produk',array('rows'=>6, 'cols'=>50)); ?>
-		<?php echo $form->error($model,'deskripsi_produk'); ?>
+	<div id="price" class="tab-pane">
+		<div class="form-group col-md-4">
+			<?php echo $form->labelEx($model,'harga_produk',array('class'=>'control-label')); ?>
+			<?php echo $form->textField($model,'harga_produk',array('class'=>'form-control')); ?>
+		</div>
 	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'jenis_produk'); ?>
-		<?php echo $form->textField($model,'jenis_produk',array('size'=>60,'maxlength'=>64)); ?>
-		<?php echo $form->error($model,'jenis_produk'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'harga_produk'); ?>
-		<?php echo $form->textField($model,'harga_produk'); ?>
-		<?php echo $form->error($model,'harga_produk'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'tanggal_input'); ?>
-		<?php echo $form->textField($model,'tanggal_input'); ?>
-		<?php echo $form->error($model,'tanggal_input'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'user_input'); ?>
-		<?php echo $form->textField($model,'user_input'); ?>
-		<?php echo $form->error($model,'user_input'); ?>
-	</div>
-
-	<div class="row buttons">
-		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
-	</div>
-
+</div>
+<div class="form-group col-md-12 mt10">
+	<?php echo CHtml::submitButton($model->isNewRecord ? Yii::t('global','Create') : Yii::t('global','Save'),array('style'=>'min-width:100px;')); ?>
+</div>
 <?php $this->endWidget(); ?>
-
-</div><!-- form -->

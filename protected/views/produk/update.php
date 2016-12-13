@@ -3,19 +3,20 @@
 /* @var $model Produk */
 
 $this->breadcrumbs=array(
-	'Produks'=>array('index'),
-	$model->id=>array('view','id'=>$model->id),
+	'Produk' => array('view'),
 	'Update',
 );
 
 $this->menu=array(
-	array('label'=>'List Produk', 'url'=>array('index')),
-	array('label'=>'Create Produk', 'url'=>array('create')),
-	array('label'=>'View Produk', 'url'=>array('view', 'id'=>$model->id)),
-	array('label'=>'Manage Produk', 'url'=>array('admin')),
+	array('label'=>'Daftar Produk', 'url'=>array('view')),
+	array('label'=>'Tambah Produk', 'url'=>array('create')),
 );
 ?>
-
-<h1>Update Produk <?php echo $model->id; ?></h1>
-
-<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h4 class="panel-title">Update Produk</h4>
+	</div>
+	<div class="panel-body">
+		<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+	</div>
+</div>

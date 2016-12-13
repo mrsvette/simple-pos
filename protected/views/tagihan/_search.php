@@ -46,11 +46,6 @@
 		<?php echo $form->textField($model,'tanggal_input'); ?>
 	</div>
 
-	<div class="row">
-		<?php echo $form->label($model,'user_input'); ?>
-		<?php echo $form->textField($model,'user_input'); ?>
-	</div>
-
 	<div class="row buttons">
 		<?php echo CHtml::submitButton('Search'); ?>
 	</div>

@@ -14,6 +14,9 @@
  */
 class Produk extends CActiveRecord
 {
+    const JENIS_MAKANAN = 'makanan';
+    const JENIS_MINUMAN = 'minuman';
+
     /**
      * @return string the associated database table name
      */
@@ -49,7 +52,10 @@ class Produk extends CActiveRecord
     {
         // NOTE: you may need to adjust the relation name and the related
         // class name for the relations automatically generated below.
-        return array();
+        return array(
+            'diskon_rel' => array(self::HAS_MANY, 'ProdukDiskon', 'id_produk'),
+            'diskon_rel_count' => array(self::STAT, 'ProdukDiskon', 'id_produk'),
+        );
     }
 
     /**
@@ -128,5 +134,34 @@ class Produk extends CActiveRecord
             $items[$name] = $name;
         }
         return $items;
+    }
+
+    public function getDiscontedItems($product_id=0)
+    {
+        if($product_id<=0)
+            $product_id = $this->id;
+        $criteria = new CDbCriteria;
+        $criteria->compare('id_produk', $product_id);
+        $criteria->order = 'jumlah_produk DESC';
+        $count = ProdukDiskon::model()->count($criteria);
+        $items = array();
+        if($count>0){
+            $models = ProdukDiskon::model()->findAll($criteria);
+            foreach($models as $model){
+                $items[] = $model;
+            }
+        }
+        return $items;
+    }
+
+    public function getListType($jenis_produk = null)
+    {
+        $items = array(
+            self::JENIS_MAKANAN => 'Makanan',
+            self::JENIS_MINUMAN => 'Minuman'
+
+        );
+
+        return (empty($jenis_produk))? $items : $item[$jenis_produk];
     }
 }

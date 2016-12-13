@@ -43,7 +43,7 @@ class Tagihan extends CActiveRecord
             array('total_tagihan', 'numerical'),
             array('nomor_tagihan', 'length', 'max' => 32),
             array('status_tagihan', 'length', 'max' => 16),
-            array('tanggal_pembayaran', 'safe'),
+            array('tanggal_pembayaran, catatan', 'safe'),
             // The following rule is used by search().
             // @todo Please remove those attributes that should not be searched.
             array('id, nomor_tagihan, id_pelanggan, total_tagihan, status_tagihan, tanggal_pembayaran, tanggal_input, user_input', 'safe', 'on' => 'search'),
@@ -76,6 +76,7 @@ class Tagihan extends CActiveRecord
             'total_tagihan' => 'Total Tagihan',
             'status_tagihan' => 'Status Tagihan',
             'tanggal_pembayaran' => 'Tanggal Pembayaran',
+            'catatan' => 'Catatan',
             'tanggal_input' => 'Tanggal Input',
             'user_input' => 'User Input',
         );
@@ -105,6 +106,7 @@ class Tagihan extends CActiveRecord
         $criteria->compare('total_tagihan', $this->total_tagihan);
         $criteria->compare('status_tagihan', $this->status_tagihan, true);
         $criteria->compare('tanggal_pembayaran', $this->tanggal_pembayaran, true);
+        $criteria->compare('catatan', $this->catatan, true);
         $criteria->compare('tanggal_input', $this->tanggal_input, true);
         $criteria->compare('user_input', $this->user_input);
 
@@ -178,5 +180,17 @@ class Tagihan extends CActiveRecord
         $rows = Yii::app()->db->createCommand($query)->queryAll();
 
         return $rows[0]['amount'];
+    }
+
+    public function getListStatus($status = null)
+    {
+        $items = array(
+                self::STATUS_PAID => 'Paid',
+                self::STATUS_UNPAID => 'Unpaid',
+                self::STATUS_REFUND => 'Refunded',
+
+            );
+
+        return (empty($status))? $items : $item[$status];
     }
 }
