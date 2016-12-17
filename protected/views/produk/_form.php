@@ -48,10 +48,7 @@
 		</div>
 	</div>
 	<div id="price" class="tab-pane">
-		<div class="form-group col-md-4">
-			<?php echo $form->labelEx($model,'harga_produk',array('class'=>'control-label')); ?>
-			<?php echo $form->textField($model,'harga_produk',array('class'=>'form-control')); ?>
-		</div>
+		<?php echo $this->renderPartial('_diskon', array('models' => $model2, 'form' => $form)); ?>
 	</div>
 </div>
 <div class="form-group col-md-12 mt10">

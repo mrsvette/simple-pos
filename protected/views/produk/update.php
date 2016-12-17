@@ -17,6 +17,12 @@ $this->menu=array(
 		<h4 class="panel-title">Update Produk</h4>
 	</div>
 	<div class="panel-body">
-		<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+		<?php if(Yii::app()->user->hasFlash('update')): ?>
+			<div class="alert alert-success mb10">
+				<button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>
+				<?php echo Yii::app()->user->getFlash('update'); ?>
+			</div>
+		<?php endif; ?>
+		<?php $this->renderPartial('_form', array('model'=>$model, 'model2'=>$model2)); ?>
 	</div>
 </div>
