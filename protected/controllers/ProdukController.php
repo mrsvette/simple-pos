@@ -27,12 +27,20 @@ class ProdukController extends Controller
     public function accessRules()
     {
         return array(
-            array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update'),
+            array('allow',
+                'actions' => array('create'),
                 'users' => array('@'),
             ),
-            array('allow', // allow admin user to perform 'admin' and 'delete' actions
-                'actions' => array('view', 'delete'),
+            array('allow',
+                'actions' => array('view', 'index'),
+                'users' => array('@'),
+            ),
+            array('allow',
+                'actions' => array('update'),
+                'users' => array('@'),
+            ),
+            array('allow',
+                'actions' => array('delete', 'deleteDiscount'),
                 'users' => array('@'),
             ),
             array('deny',  // deny all users
@@ -48,18 +56,37 @@ class ProdukController extends Controller
     public function actionCreate()
     {
         $model = new Produk;
+        $model2 = new ProdukDiskon;
 
         // Uncomment the following line if AJAX validation is needed
         // $this->performAjaxValidation($model);
 
         if (isset($_POST['Produk'])) {
             $model->attributes = $_POST['Produk'];
-            if ($model->save())
-                $this->redirect(array('view', 'id' => $model->id));
+            $model->tanggal_input = date(c);
+            $model->user_input = Yii::app()->user->id;
+            if ($model->save()){
+                foreach($_POST['ProdukDiskon']['harga_produk'] as $i => $value){
+                    if($value > 0){ //hanya jika harga_produk lebih dari 0
+                        $model3 = new ProdukDiskon;
+                        $model3->id_produk = $model->id;
+                        $model3->harga_produk = (int)$_POST['ProdukDiskon']['harga_produk'][$i];
+                        $model3->jumlah_produk = (int)$_POST['ProdukDiskon']['jumlah_produk'][$i];
+                        $model3->tanggal_mulai_diskon = (strtotime($_POST['ProdukDiskon']['tanggal_mulai_diskon'][$i])>0)? date("Y-m-d H:i:s",strtotime($_POST['ProdukDiskon']['tanggal_mulai_diskon'][$i])) : date(c);
+                        $model3->tanggal_berakhir_diskon = (strtotime($_POST['ProdukDiskon']['tanggal_berakhir_diskon'][$i])>0)? date("Y-m-d H:i:s",strtotime($_POST['ProdukDiskon']['tanggal_berakhir_diskon'][$i])) : date(c);
+                        $model3->tanggal_input = date(c);
+                        $model3->user_input = Yii::app()->user->id;
+                        $model3->save(); //eksekusi simpan data
+                    }
+                }
+                Yii::app()->user->setFlash('create', 'Data produk berhasil disimpan.');
+                $this->refresh();
+            }
         }
 
         $this->render('create', array(
             'model' => $model,
+            'model2' => $model2
         ));
     }
 
@@ -71,19 +98,48 @@ class ProdukController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->loadModel($id);
+        if($model->diskon_rel_count <=0 )
+            $model2 = new ProdukDiskon;
+        else
+            $model2 = $model->diskon_rel;
 
         // Uncomment the following line if AJAX validation is needed
         // $this->performAjaxValidation($model);
 
         if (isset($_POST['Produk'])) {
             $model->attributes = $_POST['Produk'];
-            if ($model->save())
-                $this->redirect(array('view', 'id' => $model->id));
+            if ($model->save()){
+                if(isset($_POST['ProdukDiskon']) && (count($_POST['ProdukDiskon']) > 0)){
+                    //delete semua data diskon untuk produk id = $id
+                    $deletediskon = ProdukDiskon::model()->deleteAllByAttributes(array('id_produk' => $model->id));
+                    foreach($_POST['ProdukDiskon']['harga_produk'] as $i => $value){
+                        if($value > 0){ //hanya jika harga_produk lebih dari 0
+                            $model3 = new ProdukDiskon;
+                            $model3->id_produk = $model->id;
+                            $model3->harga_produk = (int)$_POST['ProdukDiskon']['harga_produk'][$i];
+                            $model3->jumlah_produk = (int)$_POST['ProdukDiskon']['jumlah_produk'][$i];
+                            $model3->tanggal_mulai_diskon = (strtotime($_POST['ProdukDiskon']['tanggal_mulai_diskon'][$i])>0)? date("Y-m-d H:i:s",strtotime($_POST['ProdukDiskon']['tanggal_mulai_diskon'][$i])) : date(c);
+                            $model3->tanggal_berakhir_diskon = (strtotime($_POST['ProdukDiskon']['tanggal_berakhir_diskon'][$i])>0)? date("Y-m-d H:i:s",strtotime($_POST['ProdukDiskon']['tanggal_berakhir_diskon'][$i])) : date(c);
+                            $model3->tanggal_input = date(c);
+                            $model3->user_input = Yii::app()->user->id;
+                            $model3->save(); //eksekusi simpan data
+                        }
+                    }
+                }
+                Yii::app()->user->setFlash('update', 'Data produk berhasil disimpan.');
+                $this->refresh();
+            }
         }
 
         $this->render('update', array(
             'model' => $model,
+            'model2' => $model2
         ));
+    }
+
+    public function actionIndex()
+    {
+        $this->forward('view');
     }
 
     /**
@@ -93,11 +149,26 @@ class ProdukController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->loadModel($id)->delete();
+        $model = $this->loadModel($id);
+        $deletediskon = ProdukDiskon::model()->deleteAllByAttributes(array('id_produk' => $model->id));
+        $model->delete();
 
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
         if (!isset($_GET['ajax']))
             $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+    }
+
+    public function actionDeleteDiscount($id)
+    {
+        if (Yii::app()->request->isAjaxRequest) {
+            $model = ProdukDiskon::model()->findByPk($id);
+            if($model->delete()){
+                echo CJSON::encode(array('status' => 'success'));
+            }else{
+                echo CJSON::encode(array('status' => 'failed'));
+            }
+            exit;
+        }
     }
 
     /**
