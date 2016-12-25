@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 13, 2016 at 09:03 
+-- Generation Time: Dec 26, 2016 at 12:07 
 -- Server version: 5.6.16
 -- PHP Version: 5.5.9
 
@@ -85,14 +85,14 @@ CREATE TABLE IF NOT EXISTS `tbl_produk` (
   `tanggal_input` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `user_input` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=171 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=173 ;
 
 --
 -- Dumping data for table `tbl_produk`
 --
 
 INSERT INTO `tbl_produk` (`id`, `nama_produk`, `deskripsi_produk`, `jenis_produk`, `harga_produk`, `tanggal_input`, `user_input`) VALUES
-(1, 'Nasi Kebuli', '', 'makanan', 100, '2014-11-03 01:01:33', 1),
+(1, 'Nasi Kebuli', 'Lorem ipsum', 'makanan', 100, '2014-11-03 01:01:33', 1),
 (2, 'Nasi Kebuli Jumbo', '', 'makanan', 200, '2014-11-03 01:02:53', 1),
 (3, 'Gule Kambing', '', 'makanan', 300, '2014-11-03 01:04:06', 1),
 (4, 'Sate Sapi', '', 'makanan', 400, '2014-11-03 01:06:25', 1),
@@ -255,7 +255,8 @@ INSERT INTO `tbl_produk` (`id`, `nama_produk`, `deskripsi_produk`, `jenis_produk
 (164, 'Tim sumsum', 'tim, sumsum', 'makanan', 16400, '2015-09-17 21:51:42', 1),
 (168, 'Nasgor kambing jumbo', 'nasgor, kambing, jumbo', 'makanan', 16800, '2015-10-06 22:51:57', 1),
 (166, 'Shisha flavour', 'shisha, flavour', 'minuman', 16600, '2015-09-17 22:03:55', 1),
-(169, 'Nutrisari', 'nutrisari', 'minuman', 16900, '2015-10-07 22:42:55', 1);
+(169, 'Nutrisari', 'nutrisari', 'minuman', 16900, '2015-10-07 22:42:55', 1),
+(172, 'Just Test', '', 'makanan', 150, '2016-12-18 01:33:56', 1);
 
 -- --------------------------------------------------------
 
@@ -274,7 +275,16 @@ CREATE TABLE IF NOT EXISTS `tbl_produk_diskon` (
   `user_input` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `product_id` (`id_produk`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=DYNAMIC AUTO_INCREMENT=12 ;
+
+--
+-- Dumping data for table `tbl_produk_diskon`
+--
+
+INSERT INTO `tbl_produk_diskon` (`id`, `id_produk`, `jumlah_produk`, `harga_produk`, `tanggal_mulai_diskon`, `tanggal_berakhir_diskon`, `tanggal_input`, `user_input`) VALUES
+(9, 1, 1, 130, '2016-12-18 00:00:00', '2016-12-21 00:00:00', '2016-12-18 01:22:38', 1),
+(8, 1, 1, 120, '2016-12-18 00:00:00', '2016-12-19 00:00:00', '2016-12-18 01:22:38', 1),
+(7, 1, 1, 100, '2016-12-18 00:00:00', '2016-12-19 00:00:00', '2016-12-18 01:22:38', 1);
 
 -- --------------------------------------------------------
 
@@ -353,14 +363,15 @@ CREATE TABLE IF NOT EXISTS `tbl_user` (
   `tanggal_input` datetime NOT NULL,
   `user_input` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `tbl_user`
 --
 
 INSERT INTO `tbl_user` (`id`, `username`, `password`, `status`, `hak_akses`, `tanggal_input`, `user_input`) VALUES
-(1, 'demo', 'fe01ce2a7fbac8fafaed7c982a04e229', 'aktif', NULL, '2012-01-19 09:42:26', 0);
+(1, 'demo', 'fe01ce2a7fbac8fafaed7c982a04e229', 'aktif', '{"Basic":{"Pelanggan":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Produk":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Promosi":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Tagihan":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Transaksi":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"User":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"}}}', '2012-01-19 09:42:26', 0),
+(2, 'kasir', 'c7911af3adbd12a035b289556d96470a', 'aktif', '{"Basic":{"Pelanggan":{"create_p":"0","read_p":"0","update_p":"0","delete_p":"0"},"Produk":{"create_p":"0","read_p":"0","update_p":"0","delete_p":"0"},"Promosi":{"create_p":"0","read_p":"0","update_p":"0","delete_p":"0"},"Tagihan":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Transaksi":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"User":{"create_p":"0","read_p":"0","update_p":"0","delete_p":"0"}}}', '2016-12-25 23:50:50', 1);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

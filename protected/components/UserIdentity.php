@@ -15,7 +15,11 @@ class UserIdentity extends CUserIdentity
      */
     public function authenticate()
     {
-        $user = User::model()->find('LOWER(username)=?', array(strtolower($this->username)));
+		$criteria = new CDbCriteria;
+		$criteria->compare('LOWER(username)', strtolower($this->username));
+		$criteria->compare('status', User::STATUS_AKTIF);
+		
+        $user = User::model()->find($criteria);
         if ($user === null)
             $this->errorCode = self::ERROR_USERNAME_INVALID;
         else if (!$user->validatePassword($this->password))
