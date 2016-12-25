@@ -1,18 +1,19 @@
 <?php
-/* @var $this UserController */
-/* @var $model User */
-
 $this->breadcrumbs=array(
-	'Users'=>array('index'),
-	'Create',
+	'Users'=>array('view'),
+	Yii::t('global','Create'),
 );
 
 $this->menu=array(
-	array('label'=>'List User', 'url'=>array('index')),
-	array('label'=>'Manage User', 'url'=>array('admin')),
+	array('label'=>Yii::t('global','List').' User', 'url'=>array('view'),'visible'=>UserAccess::ruleAccess('read_p')),
 );
 ?>
 
-<h1>Create User</h1>
-
-<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h4 class="panel-title"><?php echo Yii::t('global','Create');?> User</h4>
+	</div>
+	<div class="panel-body">
+		<?php echo $this->renderPartial('_form', array('model'=>$model)); ?>
+	</div>
+</div>

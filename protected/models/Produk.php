@@ -162,6 +162,6 @@ class Produk extends CActiveRecord
 
         );
 
-        return (empty($jenis_produk))? $items : $item[$jenis_produk];
+        return (empty($jenis_produk))? $items : $items[$jenis_produk];
     }
 }
