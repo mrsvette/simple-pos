@@ -12,6 +12,9 @@ return array(
     // preloading 'log' component
     'preload' => array('log'),
 
+	//default language
+	'language'=>'id',
+
     // autoloading model and component classes
     'import' => array(
         'application.models.*',
@@ -88,5 +91,7 @@ return array(
         'struk_logo' => 'struk-logo.png',
         'alamat' => 'Jl. Palagan Km 5, Sleman, DIY',
         'thanks_note' => 'Terimakasih, Selamat belanja kembali.',
+		'daily_open' => '11:00',
+		'shift_hour' => '19:00',
     ),
 );

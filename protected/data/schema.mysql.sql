@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 26, 2016 at 12:07 
+-- Generation Time: Dec 26, 2016 at 11:41 
 -- Server version: 5.6.16
 -- PHP Version: 5.5.9
 
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `tbl_detail_tagihan` (
   `id_promosi` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `invoice_id_idx` (`id_tagihan`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=15 ;
 
 --
 -- Dumping data for table `tbl_detail_tagihan`
@@ -44,7 +44,10 @@ CREATE TABLE IF NOT EXISTS `tbl_detail_tagihan` (
 
 INSERT INTO `tbl_detail_tagihan` (`id`, `id_tagihan`, `id_produk`, `jumlah`, `harga`, `diskon`, `id_promosi`) VALUES
 (11, 3, 3, 1, 300.00, 0, 0),
-(10, 3, 1, 2, 100.00, 0, 0);
+(10, 3, 1, 2, 100.00, 0, 0),
+(12, 4, 4, 1, 400.00, 0, 0),
+(13, 4, 7, 1, 700.00, 0, 0),
+(14, 4, 10, 1, 1000.00, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -68,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `tbl_pelanggan` (
 --
 
 INSERT INTO `tbl_pelanggan` (`id`, `nama_pelanggan`, `email_pelanggan`, `telepon_pelanggan`, `alamat_pelanggan`, `tanggal_input`, `user_input`) VALUES
-(1, 'pelanggan 1', 'effendi@localhost.com', '1', '1', '2013-03-07 07:55:32', 0);
+(1, 'pelanggan 1', 'effendi@localhost.com', '0812', 'jl Magelang KM 8', '2013-03-07 07:55:32', 0);
 
 -- --------------------------------------------------------
 
@@ -311,14 +314,15 @@ CREATE TABLE IF NOT EXISTS `tbl_promosi` (
   KEY `end_index_idx` (`tanggal_berakhir_promosi`),
   KEY `active_index_idx` (`status_promosi`),
   KEY `code_index_idx` (`kode_promosi`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `tbl_promosi`
 --
 
 INSERT INTO `tbl_promosi` (`id`, `kode_promosi`, `deskripsi`, `jenis_promosi`, `nilai_promosi`, `maksimal_digunakan`, `telah_digunakan`, `status_promosi`, `produk_yang_terdiskon`, `tanggal_mulai_promosi`, `tanggal_berakhir_promosi`, `tanggal_input`, `user_input`) VALUES
-(1, 'DISC25%', '', 'percentage', 20, 0, 0, 'aktif', NULL, '2014-10-06 00:00:00', '2015-06-30 00:00:00', '2014-10-24 00:00:00', '2014-10-24 00:00:00');
+(1, 'DISC25%', '', 'percentage', 20, 0, 0, 'aktif', '["1 - Nasi Kebuli","2 - Nasi Kebuli Jumbo"]', '2014-10-06 00:00:00', '2015-06-30 00:00:00', '2014-10-24 00:00:00', '2014-10-24 00:00:00'),
+(2, 'JustTest', '', 'absolute', 100, 100, 0, 'aktif', '["3 - Gule Kambing","4 - Sate Sapi"]', '2016-12-26 00:00:00', '2016-12-26 00:00:00', '2016-12-26 14:47:24', '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -339,14 +343,15 @@ CREATE TABLE IF NOT EXISTS `tbl_tagihan` (
   `user_input` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `client_id_idx` (`id_pelanggan`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `tbl_tagihan`
 --
 
 INSERT INTO `tbl_tagihan` (`id`, `nomor_tagihan`, `id_pelanggan`, `total_tagihan`, `status_tagihan`, `tanggal_pembayaran`, `catatan`, `config`, `tanggal_input`, `user_input`) VALUES
-(3, 'P-INV-0004', 0, 500, 'refund', '2016-12-12 01:29:02', NULL, '{"items_belanja":[{"id":"1","name":"Nasi Kebuli","desc":"","unit_price":"100","qty":2,"discount":0,"change_value":1},{"id":"3","name":"Gule Kambing","desc":"","unit_price":"300","qty":1,"discount":0,"change_value":1}],"items_payment":{"amount_tendered":"500","change":0},"customer":null,"promocode":null}', '2016-12-12 00:51:17', 1);
+(4, 'P-INV-0005', 0, 2100, 'paid', '2016-12-25 22:46:37', NULL, '{"items_belanja":[{"id":"4","name":"Sate Sapi","desc":"","unit_price":"400","qty":1,"discount":0,"change_value":1},{"id":"7","name":"Nasi Ayam Goreng","desc":"nasi, ayam, goreng","unit_price":"700","qty":1,"discount":0,"change_value":1},{"id":"10","name":"Nasgor Kambing","desc":"nasgor, kambing","unit_price":"1000","qty":1,"discount":0,"change_value":1}],"items_payment":{"amount_tendered":"2100","change":0},"customer":null,"promocode":null}', '2016-12-25 22:46:37', 1),
+(3, 'P-INV-0004', 0, 500, 'paid', '2016-12-26 01:29:02', NULL, '{"items_belanja":[{"id":"1","name":"Nasi Kebuli","desc":"","unit_price":"100","qty":2,"discount":0,"change_value":1},{"id":"3","name":"Gule Kambing","desc":"","unit_price":"300","qty":1,"discount":0,"change_value":1}],"items_payment":{"amount_tendered":"500","change":0},"customer":null,"promocode":null}', '2016-12-26 00:51:17', 1);
 
 -- --------------------------------------------------------
 
@@ -370,7 +375,7 @@ CREATE TABLE IF NOT EXISTS `tbl_user` (
 --
 
 INSERT INTO `tbl_user` (`id`, `username`, `password`, `status`, `hak_akses`, `tanggal_input`, `user_input`) VALUES
-(1, 'demo', 'fe01ce2a7fbac8fafaed7c982a04e229', 'aktif', '{"Basic":{"Pelanggan":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Produk":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Promosi":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Tagihan":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Transaksi":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"User":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"}}}', '2012-01-19 09:42:26', 0),
+(1, 'demo', 'fe01ce2a7fbac8fafaed7c982a04e229', 'aktif', '{"Basic":{"Laporan":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Pelanggan":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Produk":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Promosi":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Tagihan":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Transaksi":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"User":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"}}}', '2012-01-19 09:42:26', 0),
 (2, 'kasir', 'c7911af3adbd12a035b289556d96470a', 'aktif', '{"Basic":{"Pelanggan":{"create_p":"0","read_p":"0","update_p":"0","delete_p":"0"},"Produk":{"create_p":"0","read_p":"0","update_p":"0","delete_p":"0"},"Promosi":{"create_p":"0","read_p":"0","update_p":"0","delete_p":"0"},"Tagihan":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"Transaksi":{"create_p":"1","read_p":"1","update_p":"1","delete_p":"1"},"User":{"create_p":"0","read_p":"0","update_p":"0","delete_p":"0"}}}', '2016-12-25 23:50:50', 1);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
