@@ -9,7 +9,7 @@
     <!-- Page title -->
     <div class="page-title">
         <h5><i class="fa fa-bars"></i> <?php echo Yii::t('menu', 'Dashboard'); ?>
-            <small><?php echo Yii::t('menu', 'Welcome'); ?>, <?php echo ucfirst(Yii::app()->user->name); ?>!</small>
+            <small>Selamat datang, <?php echo ucfirst(Yii::app()->user->name); ?>!</small>
         </h5>
         <div class="btn-group">
             <a href="#" class="btn btn-link btn-lg btn-icon dropdown-toggle" data-toggle="dropdown"><i

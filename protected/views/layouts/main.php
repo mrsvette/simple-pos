@@ -36,7 +36,7 @@
                 <ul class="nav navbar-nav navbar-left-custom">
                     <li class="user dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown">
-                            <img src="<?php echo Yii::app()->request->baseUrl.'/uploads/'; ?>images/face6.png" alt="">
+                            <img src="<?php echo Yii::app()->request->baseUrl.'/'; ?>images/face6.png" alt="">
                             <span><?php echo Yii::app()->user->name;?></span>
                             <i class="caret"></i>
                         </a>
