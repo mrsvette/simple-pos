@@ -27,33 +27,30 @@ class PelangganController extends Controller
     public function accessRules()
     {
         return array(
-            array('allow',  // allow all users to perform 'index' and 'view' actions
-                'actions' => array('index', 'view', 'choose'),
+            array('allow',
+                'actions' => array('choose'),
                 'users' => array('@'),
             ),
-            array('allow', // allow authenticated user to perform 'create' and 'update' actions
-                'actions' => array('create', 'update'),
-                'users' => array('@'),
+            array('allow',
+                'actions' => array('index', 'view'),
+                'expression' => 'UserAccess::ruleAccess(\'read_p\')',
             ),
-            array('allow', // allow admin user to perform 'admin' and 'delete' actions
-                'actions' => array('admin', 'delete'),
-                'users' => array('admin'),
+            array('allow',
+                'actions' => array('create'),
+                'expression' => 'UserAccess::ruleAccess(\'create_p\')',
+            ),
+            array('allow',
+                'actions' => array('update'),
+                'expression' => 'UserAccess::ruleAccess(\'update_p\')',
+            ),
+            array('allow',
+                'actions' => array('delete'),
+                'expression' => 'UserAccess::ruleAccess(\'delete_p\')',
             ),
             array('deny',  // deny all users
                 'users' => array('*'),
             ),
         );
-    }
-
-    /**
-     * Displays a particular model.
-     * @param integer $id the ID of the model to be displayed
-     */
-    public function actionView($id)
-    {
-        $this->render('view', array(
-            'model' => $this->loadModel($id),
-        ));
     }
 
     /**
@@ -69,8 +66,12 @@ class PelangganController extends Controller
 
         if (isset($_POST['Pelanggan'])) {
             $model->attributes = $_POST['Pelanggan'];
-            if ($model->save())
-                $this->redirect(array('view', 'id' => $model->id));
+            $model->tanggal_input = date(c);
+            $model->user_input = Yii::app()->user->id;
+            if ($model->save()){
+                Yii::app()->user->setFlash('create', 'Data pelanggan berhasil disimpan.');
+                $this->refresh();
+            }
         }
 
         $this->render('create', array(
@@ -92,8 +93,10 @@ class PelangganController extends Controller
 
         if (isset($_POST['Pelanggan'])) {
             $model->attributes = $_POST['Pelanggan'];
-            if ($model->save())
-                $this->redirect(array('view', 'id' => $model->id));
+            if ($model->save()){
+                Yii::app()->user->setFlash('update', 'Data pelanggan berhasil disimpan.');
+                $this->refresh();
+            }
         }
 
         $this->render('update', array(
@@ -120,23 +123,20 @@ class PelangganController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new CActiveDataProvider('Pelanggan');
-        $this->render('index', array(
-            'dataProvider' => $dataProvider,
-        ));
+        $this->forward('view');
     }
 
     /**
      * Manages all models.
      */
-    public function actionAdmin()
+    public function actionView()
     {
         $model = new Pelanggan('search');
         $model->unsetAttributes();  // clear any default values
         if (isset($_GET['Pelanggan']))
             $model->attributes = $_GET['Pelanggan'];
 
-        $this->render('admin', array(
+        $this->render('view', array(
             'model' => $model,
         ));
     }

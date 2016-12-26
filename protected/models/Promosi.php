@@ -41,7 +41,7 @@ class Promosi extends CActiveRecord
         // NOTE: you should only define rules for those attributes that
         // will receive user inputs.
         return array(
-            array('tanggal_input, user_input', 'required'),
+            array('kode_promosi, nilai_promosi, tanggal_input, user_input', 'required'),
             array('maksimal_digunakan, telah_digunakan', 'numerical', 'integerOnly' => true),
             array('nilai_promosi', 'numerical'),
             array('kode_promosi', 'length', 'max' => 100),
@@ -150,6 +150,16 @@ class Promosi extends CActiveRecord
         $items = array(self::TYPE_ABSOLUTE => 'Absolute', self::TYPE_PERCENTAGE => 'Percentage');
         if (!empty($type))
             return $items[$type];
+        else
+            return $items;
+    }
+
+    public function getListStatus($status = null)
+    {
+
+        $items = array(self::STATUS_AKTIF => 'Aktif', self::STATUS_TIDAK_AKTIF => 'Tidak Aktif');
+        if (!empty($status))
+            return $items[$status];
         else
             return $items;
     }
