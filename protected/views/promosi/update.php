@@ -3,19 +3,26 @@
 /* @var $model Promosi */
 
 $this->breadcrumbs=array(
-	'Promosis'=>array('index'),
-	$model->id=>array('view','id'=>$model->id),
+	'Promosi' => array('view'),
 	'Update',
 );
 
 $this->menu=array(
-	array('label'=>'List Promosi', 'url'=>array('index')),
-	array('label'=>'Create Promosi', 'url'=>array('create')),
-	array('label'=>'View Promosi', 'url'=>array('view', 'id'=>$model->id)),
-	array('label'=>'Manage Promosi', 'url'=>array('admin')),
+	array('label'=>'Daftar Promosi', 'url'=>array('view')),
+	array('label'=>'Tambah Promosi', 'url'=>array('create')),
 );
 ?>
-
-<h1>Update Promosi <?php echo $model->id; ?></h1>
-
-<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h4 class="panel-title">Update Promosi</h4>
+	</div>
+	<div class="panel-body">
+		<?php if(Yii::app()->user->hasFlash('update')): ?>
+			<div class="alert alert-success mb10">
+				<button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>
+				<?php echo Yii::app()->user->getFlash('update'); ?>
+			</div>
+		<?php endif; ?>
+		<?php $this->renderPartial('_form', array('model'=>$model)); ?>
+	</div>
+</div>

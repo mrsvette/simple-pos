@@ -19,43 +19,31 @@
 
 	<?php echo $form->errorSummary($model); ?>
 
-	<div class="row">
+	<div class="form-group col-md-4">
 		<?php echo $form->labelEx($model,'nama_pelanggan'); ?>
 		<?php echo $form->textField($model,'nama_pelanggan',array('size'=>60,'maxlength'=>128)); ?>
 		<?php echo $form->error($model,'nama_pelanggan'); ?>
 	</div>
 
-	<div class="row">
+	<div class="form-group col-md-4">
 		<?php echo $form->labelEx($model,'email_pelanggan'); ?>
 		<?php echo $form->textField($model,'email_pelanggan',array('size'=>60,'maxlength'=>128)); ?>
 		<?php echo $form->error($model,'email_pelanggan'); ?>
 	</div>
 
-	<div class="row">
+	<div class="form-group col-md-4">
 		<?php echo $form->labelEx($model,'telepon_pelanggan'); ?>
 		<?php echo $form->textField($model,'telepon_pelanggan',array('size'=>32,'maxlength'=>32)); ?>
 		<?php echo $form->error($model,'telepon_pelanggan'); ?>
 	</div>
 
-	<div class="row">
+	<div class="form-group col-md-12">
 		<?php echo $form->labelEx($model,'alamat_pelanggan'); ?>
-		<?php echo $form->textArea($model,'alamat_pelanggan',array('rows'=>6, 'cols'=>50)); ?>
+		<?php echo $form->textArea($model,'alamat_pelanggan',array('rows'=>3, 'cols'=>50)); ?>
 		<?php echo $form->error($model,'alamat_pelanggan'); ?>
 	</div>
 
-	<div class="row">
-		<?php echo $form->labelEx($model,'tanggal_input'); ?>
-		<?php echo $form->textField($model,'tanggal_input'); ?>
-		<?php echo $form->error($model,'tanggal_input'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->labelEx($model,'user_input'); ?>
-		<?php echo $form->textField($model,'user_input'); ?>
-		<?php echo $form->error($model,'user_input'); ?>
-	</div>
-
-	<div class="row buttons">
+	<div class="form-group col-md-4 buttons">
 		<?php echo CHtml::submitButton($model->isNewRecord ? 'Create' : 'Save'); ?>
 	</div>
 
