@@ -166,4 +166,9 @@ class User extends CActiveRecord
         $user_status = self::getListStatus($status);
         return $user_status;
     }
+
+    public function find($id)
+    {
+        return self::model()->findByPk($id);
+    }
 }

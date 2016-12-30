@@ -191,15 +191,19 @@ class LaporanController extends Controller
 
 	public function actionAnalitik()
 	{
-		/*if(!Order::hasAnalyticConfig())
-			return false;
-		$criteria=new CDbCriteria;
-		$criteria->compare('executed',0);
-		$criteria->order='id DESC';
-
-		$dataProvider = new CActiveDataProvider('Queue',array('criteria'=>$criteria));
-		$this->render('analitik',array(
-			'dataProvider'=>$dataProvider,
-		));*/
+        $dataProvider = new CArrayDataProvider(Tagihan::getQueue(), array(
+            //'id' => 'date-order',
+            /*'sort' => array(
+                'attributes' => array(
+                    'id', 'username', 'email',
+                ),
+            ),*/
+            'pagination' => array(
+                'pageSize' => 20,
+            ),
+        ));
+        $this->render('analitik',array(
+            'dataProvider' => $dataProvider
+        ));
 	}
 }

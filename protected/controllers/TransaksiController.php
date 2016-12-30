@@ -237,13 +237,7 @@ class TransaksiController extends Controller
                         Yii::app()->user->setState('promocode', null);
                     }
                     //add queue for analytics
-                    /*if (Order::hasAnalyticConfig()) {
-                        $queue = new Queue;
-                        $queue->invoice_id = $invoice_id;
-                        $queue->date_entry = date(c);
-                        $queue->user_entry = Yii::app()->user->id;
-                        $queue->save();
-                    }*/
+                    $this->addQueue($invoice_id);
 
                     echo CJSON::encode(array(
                         'status' => 'success',
@@ -655,5 +649,44 @@ class TransaksiController extends Controller
                 $this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('index'));
         } else
             throw new CHttpException(400, 'Invalid request. Please do not repeat this request again.');
+    }
+
+    private function addQueue($invoice_id)
+    {
+        $path = Yii::getPathOfAlias('application.data');
+        if (!is_writable($path)){
+            throw new CHttpException(400, 'Please make sure this folder is writable: '.$path.'.');
+        }
+        $file = $path.'/'.Tagihan::QUEUE_FILE_NAME;
+        if(!file_exists($file)){
+            $fh = fopen($file, 'w');
+        }
+        $json = json_decode(file_get_contents($file),true);
+
+        $tagihan = Tagihan::model()->findByPk($invoice_id);
+        //detail tagihan
+        $details = array(); $products = array();
+        if($tagihan->items_count > 0){
+            foreach ($tagihan->items_rel as $detail){
+                $details[] = $detail->attributes;
+                $products[$detail->id_produk] = $detail->produk_rel->attributes;
+            }
+        }
+        $data = array();
+        $data[$invoice_id] = array(
+            'tagihan' => $tagihan->attributes,
+            'detail_tagihan' => $details,
+            'pelanggan' => $tagihan->customer_rel->attributes,
+            'produk' => $products,
+        );
+
+        if(is_array($json)){
+            $json[$invoice_id] = $data[$invoice_id];
+        }else{
+            $json = $data;
+        }
+
+        $write = file_put_contents($file, json_encode($json));
+        return ($write>0)? true : false;
     }
 }

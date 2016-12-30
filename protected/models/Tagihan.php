@@ -25,6 +25,8 @@ class Tagihan extends CActiveRecord
 	public $date_from;
 	public $date_to;
 
+    const QUEUE_FILE_NAME = "schema.queue.json";
+
     /**
      * @return string the associated database table name
      */
@@ -361,4 +363,26 @@ class Tagihan extends CActiveRecord
 		
 		return $q;
 	}
+
+	public function getQueue()
+    {
+        $path = Yii::getPathOfAlias('application.data');
+        $file = $path.'/'.self::QUEUE_FILE_NAME;
+        $rawData = array();
+        if(file_exists($file)){
+            $rawData = json_decode(file_get_contents($file),true);
+        }
+        return $rawData;
+    }
+
+    public function setQueue($data)
+    {
+        $path = Yii::getPathOfAlias('application.data');
+        $file = $path.'/'.self::QUEUE_FILE_NAME;
+        if(!file_exists($file)){
+            $fh = fopen($file, 'w');
+        }
+        $write = file_put_contents($file, json_encode($data));
+        return ($write>0)? true : false;
+    }
 }

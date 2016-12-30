@@ -150,6 +150,11 @@ class TagihanController extends Controller
         $model = Tagihan::model()->findByPk($id);
         if($model->delete()){
             DetailTagihan::model()->deleteAllByAttributes(array('id_tagihan'=>$id));
+            $queue = Tagihan::getQueue();
+            if(in_array($id, array_keys($queue))){
+                unset($queue[$id]);
+                Tagihan::setQueue($queue);
+            }
         }
 
         // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
