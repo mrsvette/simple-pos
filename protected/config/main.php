@@ -93,5 +93,6 @@ return array(
         'thanks_note' => 'Terimakasih, Selamat belanja kembali.',
 		'daily_open' => '11:00',
 		'shift_hour' => '19:00',
+        'analitik_url' => 'http://simpelpos.jagungbakar.web.id/laporan/pull',
     ),
 );

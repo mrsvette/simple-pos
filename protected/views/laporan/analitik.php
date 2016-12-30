@@ -57,7 +57,7 @@ $this->menu = array(
             'complete': function () {
                 Loading.hide();
             },
-            'url': "<?php echo Yii::app()->createUrl('/' . Yii::app()->controller->module->id . '/reports/push');?>",
+            'url': "<?php echo Yii::app()->createUrl('/laporan/push');?>",
             'type': 'post',
             'dataType': 'json',
             'async': true,

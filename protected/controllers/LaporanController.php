@@ -41,8 +41,12 @@ class LaporanController extends Controller
                 'expression' => 'UserAccess::ruleAccess(\'read_p\')',
             ),
             array('allow',
-                'actions' => array('create', 'exportExcel', 'analitik'),
+                'actions' => array('create', 'exportExcel', 'analitik', 'push', 'pull'),
                 'expression' => 'UserAccess::ruleAccess(\'create_p\')',
+            ),
+            array('allow',
+                'actions' => array('pull'),
+                'users' => array('*'),
             ),
             array('deny',  // deny all users
                 'users' => array('*'),
@@ -192,12 +196,6 @@ class LaporanController extends Controller
 	public function actionAnalitik()
 	{
         $dataProvider = new CArrayDataProvider(Tagihan::getQueue(), array(
-            //'id' => 'date-order',
-            /*'sort' => array(
-                'attributes' => array(
-                    'id', 'username', 'email',
-                ),
-            ),*/
             'pagination' => array(
                 'pageSize' => 20,
             ),
@@ -206,4 +204,110 @@ class LaporanController extends Controller
             'dataProvider' => $dataProvider
         ));
 	}
+
+    public function actionPush()
+    {
+        if(Yii::app()->request->isAjaxRequest ){
+            // Stop jQuery from re-initialization
+            Yii::app()->clientScript->scriptMap['jquery.js'] = false;
+            $models = Tagihan::getQueue();
+            foreach($models as $id_tagihan => $model){
+                $tagihan = Tagihan::model()->findByPk($id_tagihan);
+                //detail tagihan
+                $details = array(); $products = array();
+                if($tagihan->items_count > 0){
+                    foreach ($tagihan->items_rel as $detail){
+                        $details[] = $detail->attributes;
+                        $products[$detail->id_produk] = $detail->produk_rel->attributes;
+                    }
+                }
+                $data = array(
+                    'tagihan' => $tagihan->attributes,
+                    'detail_tagihan' => $details,
+                    'pelanggan' => $tagihan->customer_rel->attributes,
+                    'produk' => $products,
+                );
+                $curl = $this->get_curl(
+                    Yii::app()->params['analitik_url'],
+                    array(
+                        'data'=>$data
+                    )
+                );
+                $respon = CJSON::decode($curl);
+
+                if($respon['success']){
+                    unset($models[$id_tagihan]);
+                    Tagihan::setQueue($models);
+                }
+            }
+
+            echo CJSON::encode(array(
+                'status'=>'success',
+                'div'=>'<div class="alert alert-success">Laporan berhasil diupload.</div>',
+            ));
+            exit;
+        }
+    }
+
+    private function get_curl($url, $post_vars = false)
+    {
+        //url-ify the data for the POST
+        $fields_string = http_build_query($post_vars);
+        //open connection
+        $ch = curl_init();
+
+        //set the url, number of POST vars, POST data
+        curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch,CURLOPT_URL, $url);
+        curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
+
+        //execute post
+        $result = curl_exec($ch);
+        if(curl_error($ch))
+        {
+            echo 'error:' . curl_error($ch);
+        }
+        //close connection
+        curl_close($ch);
+        return $result;
+    }
+
+    public function actionPull()
+    {
+        if(isset($_POST['data']['tagihan'])){
+            $tagihan = Tagihan::model()->findByPk($_POST['data']['tagihan']['id']);
+            if(empty($tagihan)){
+                $tagihan = new Tagihan;
+                $tagihan->attributes = $_POST['data']['tagihan'];
+                if($tagihan->save()){
+                    //save the detail
+                    foreach ($_POST['data']['detail_tagihan'] as $id => $dattributes){
+                        $dtagihan = new DetailTagihan;
+                        $dtagihan->attributes = $dattributes;
+                        $dtagihan->save();
+                    }
+                    //save produk
+                    foreach ($_POST['data']['produk'] as $idp => $pattributes){
+                        $produk = Produk::model()->findByPk($pattributes['id']);
+                        if(empty($produk))
+                            $produk = new Produk;
+                        $produk->attributes = $dattributes;
+                        $produk->save();
+                    }
+                    //save pelanggan
+                    if(isset($_POST['data']['pelanggan'])){
+                        $pelanggan = Pelanggan::model()->findByPk($_POST['data']['pelanggan']['id']);
+                        if(empty($pelanggan))
+                            $pelanggan = new Pelanggan;
+                        $pelanggan->attributes = $_POST['data']['pelanggan'];
+                        $pelanggan->save();
+                    }
+                    echo CJSON::encode(array('success'=>true)); exit;
+                }
+            }
+            echo CJSON::encode(array('success'=>false)); exit;
+        }
+        echo CJSON::encode(array('success'=>false));
+        exit;
+    }
 }

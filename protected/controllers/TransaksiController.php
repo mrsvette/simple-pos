@@ -664,20 +664,9 @@ class TransaksiController extends Controller
         $json = json_decode(file_get_contents($file),true);
 
         $tagihan = Tagihan::model()->findByPk($invoice_id);
-        //detail tagihan
-        $details = array(); $products = array();
-        if($tagihan->items_count > 0){
-            foreach ($tagihan->items_rel as $detail){
-                $details[] = $detail->attributes;
-                $products[$detail->id_produk] = $detail->produk_rel->attributes;
-            }
-        }
         $data = array();
         $data[$invoice_id] = array(
-            'tagihan' => $tagihan->attributes,
-            'detail_tagihan' => $details,
-            'pelanggan' => $tagihan->customer_rel->attributes,
-            'produk' => $products,
+            'tagihan' => $tagihan->attributes
         );
 
         if(is_array($json)){
