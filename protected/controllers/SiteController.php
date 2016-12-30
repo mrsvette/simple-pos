@@ -41,7 +41,7 @@ class SiteController extends Controller
     {
         return array(
             array('allow',  // allow all users to perform 'login' actions
-                'actions' => array('login', 'chaptcha'),
+                'actions' => array('login', 'chaptcha','error'),
                 'users' => array('*'),
             ),
             array('allow', // allow authenticated user to perform 'create' and 'update' actions
