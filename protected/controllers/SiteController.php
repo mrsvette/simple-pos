@@ -61,7 +61,10 @@ class SiteController extends Controller
     public function actionIndex()
     {
         //forward ke url /tagihan/create
-        $this->forward('transaksi/create');
+        if(UserAccess::hasAccess('transaksi', Yii::app()->user->id, 'create_p'))
+            $this->forward('transaksi/create');
+        else
+            $this->forward('laporan/dashboard');
     }
 
     /**

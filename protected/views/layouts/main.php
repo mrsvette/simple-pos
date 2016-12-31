@@ -100,17 +100,21 @@
 			</div>
 			<?php if(!Yii::app()->user->isGuest):?>
             <ul class="middle-nav">
+				<?php if (UserAccess::hasAccess('tagihan', Yii::app()->user->id, 'read_p')):?>
                 <li>
 					<a href="<?php echo Yii::app()->createUrl('/tagihan/view');?>" class="btn btn-default">
 						<i class="fa fa-money"></i> <span>Daftar Transaksi</span>
 					</a>
 					<div class="label label-info"><?php //echo Invoice::getTotalPaid();?></div>
 				</li>
+				<?php endif; ?>
+				<?php if (UserAccess::hasAccess('transaksi', Yii::app()->user->id, 'create_p')):?>
 				<li>
 					<a href="<?php echo Yii::app()->createUrl('/');?>" class="btn btn-default">
 						<i class="fa fa-briefcase"></i> <span>Transaksi Baru</span>
 					</a>
 				</li>
+				<?php endif; ?>
             </ul>
 			<?php endif;?>
 	</div>
