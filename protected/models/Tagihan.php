@@ -182,7 +182,7 @@ class Tagihan extends CActiveRecord
         if($id==0)
             $id = $this->id;
 
-        $query = 'SELECT SUM(harga) AS amount FROM '.Yii::app()->db->tablePrefix.'detail_tagihan WHERE id_tagihan='.$id.'';
+        $query = 'SELECT SUM(harga*jumlah) AS amount FROM '.Yii::app()->db->tablePrefix.'detail_tagihan WHERE id_tagihan='.$id.'';
         $rows = Yii::app()->db->createCommand($query)->queryAll();
 
         return $rows[0]['amount'];
