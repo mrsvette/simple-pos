@@ -4,11 +4,11 @@
         'method' => 'post',
         'id' => uniqid(),
     )); ?>
-    <div class="form-group col-sm-6">
+    <div class="form-group col-sm-6 hide">
         <?php echo $form->label($model, 'id', array('class' => 'control-label')); ?>
         <?php echo $form->textField($model, 'id', array('size' => 10, 'class' => 'form-control', 'value' => $default['Items']['barcode'])); ?>
     </div>
-    <div class="form-group col-sm-6">
+    <div class="form-group col-sm-12">
         <?php echo $form->label($model, 'nama_produk', array('class' => 'control-label')); ?>
         <?php echo CHtml::textField('items_name', $default['items_name'], array('size' => 30, 'class' => 'form-control')); ?>
     </div>
