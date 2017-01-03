@@ -71,7 +71,7 @@
 						<tbody>
 						<tr>
 							<td><b><?php echo Yii::t('order','Sub Total');?></b></td>
-							<td><h3><span id="sub-total" style="font-size:35px;"><?php //echo number_format($this->getTotalBelanja(),0,',','.');?></span></h3></td>
+							<td><h3><span id="sub-total" style="font-size:35px;"><?php echo number_format($this->getTotalBelanja(),0,',','.');?></span></h3></td>
 						</tr>
 						</tbody>
 					</table>
@@ -174,8 +174,8 @@ Yii::app()->clientScript->registerScript('tekan',"
 					$('span[id="sub-total"]').html(data.subtotal);
 					$('#discount-'+id).html(data.discount);
 					$('#total-item-'+id).html(data.total);
-					//if($('#promocode').val().length>0)
-					//window.location.reload(true);
+					if($('#promocode').val().length>0)
+						window.location.reload(true);
 					$("input[id=\'scan\']").focus();
 				}else
 					$this.val(1);
@@ -423,13 +423,12 @@ Yii::app()->clientScript->registerScript('tekan',"
 
 		document.onkeydown = function(e){
 			setfocus();
-//alert(e.keyCode);
-			if (e.keyCode==17){//--Tombol_CTRL---
+			/*if (e.keyCode==17){//--Tombol_CTRL---
 				//$('#find-btn').click();
 				//listItems();
 				$("#list-item").find('button.selectpicker').click();
-			}
-			else if (e.keyCode==9){//--Tombol_TAB---
+			}*/
+			if (e.keyCode==9){//--Tombol_TAB---
 				$('#payment-btn').click();
 			}
 			else if (e.keyCode==18){//--Tombol_ALT---

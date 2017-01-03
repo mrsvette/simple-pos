@@ -210,9 +210,14 @@ $this->menu = array(
 							'value'=>'$data->jumlah'
 						),
 						array(
+							'name'=>'diskon',
+							'type'=>'raw',
+							'value'=>'($data->id_promosi>0)? $data->diskon*$data->jumlah : $data->diskon'
+						),
+						array(
 							'name'=>'harga',
 							'type'=>'raw',
-							'value'=>'$data->harga'
+							'value'=>'$data->harga*$data->jumlah'
 						),
 						array(
 							'class'=>'CButtonColumn',
@@ -247,7 +252,7 @@ $this->menu = array(
 	<div class="col-sm-4">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h4 class="panel-title"><?php echo Yii::t('global','Invoice items');?></h4>
+			<h4 class="panel-title">Detail Tagihan</h4>
 		</div>
 		<div class="panel-body">
 			<div class="table-responsive">
@@ -256,9 +261,10 @@ $this->menu = array(
 							<thead>
 								<tr>
 									<th>&nbsp;</th>
-									<th><?php echo Yii::t('order','Title');?></th>
-									<th><?php echo Yii::t('order','Quantity');?></th>
-									<th><?php echo Yii::t('order','Price');?></th>
+									<th><?php echo Yii::t('order','Nama');?></th>
+									<th><?php echo Yii::t('order','Jml');?></th>
+									<th><?php echo Yii::t('order','Diskon');?></th>
+									<th><?php echo Yii::t('order','Harga');?></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -268,12 +274,13 @@ $this->menu = array(
 								<td><?php echo $no;?></td>	
 								<td><?php echo CHtml::link($item->produk_rel->nama_produk,array('/produk/update','id'=>$item->id_produk));?></td>
 								<td><?php echo $item->jumlah;?></td>
+								<td><?php echo ($item->id_promosi>0)? $item->diskon*$item->jumlah : $item->diskon;?></td>
 								<td><?php echo number_format($item->harga*$item->jumlah,0,',','.');?></td>
 							</tr>
 						<?php $no++;?>
 						<?php endforeach;?>
 							<tr>
-								<td colspan="3"><b>TOTAL</b></td>
+								<td colspan="4"><b>TOTAL</b></td>
 								<td><b><?php echo number_format($model->total_tagihan,0,',','.');?></b></td>
 							</tr>
 							</tbody>
