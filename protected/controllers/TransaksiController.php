@@ -158,6 +158,9 @@ class TransaksiController extends Controller
                 $cart_discount = $items_belanja[$id]['discount'] / $items_belanja[$id]['qty'];
                 $items_belanja[$id]['qty'] = (int)$_POST['qty'];
                 $model = Produk::model()->findByPk($items_belanja[$id]['id']);
+                //remove promocode if any, avoid any confusion price calculation, just put the promocode before payment
+                if (Yii::app()->user->hasState('promocode'))
+                    Yii::app()->user->setState('promocode', null);
                 $price = 0;
                     if ($model->diskon_rel_count > 0) {
                         foreach ($model->getDiscontedItems() as $index => $data) {
@@ -165,7 +168,7 @@ class TransaksiController extends Controller
                                 $data->jumlah_produk = 1;
                             $bagi = $items_belanja[$id]['qty'] / $data->jumlah_produk;
                             $mod = $items_belanja[$id]['qty'] % $data->jumlah_produk;
-                            if (((int)$bagi > 0) & ($bagi <= $data->jumlah_produk)) {
+                            if ($bagi > 0){
                                 if (time() >= strtotime($data->tanggal_mulai_diskon) && time() <= strtotime($data->tanggal_berakhir_diskon)) {
                                     $price = (int)$bagi * $data->harga_produk;
                                     if ($mod > 0)
@@ -184,7 +187,7 @@ class TransaksiController extends Controller
                         $total = $price;
                     else
                         $total = $items_belanja[$id]['unit_price'] * $items_belanja[$id]['qty'];
-                    //$discount=($model->price->sold_price*$_POST['qty'])-$total;
+                    
                     $discount = $items_belanja[$id]['discount'];
 
                     echo CJSON::encode(array(
@@ -245,7 +248,7 @@ class TransaksiController extends Controller
                                 $model3->diskon = Promosi::getDiscountValue(Yii::app()->user->getState('promocode'), $model3->harga);
                             }
                             if($model3->save()){
-                                $tot_tagihan = $tot_tagihan + ($data['unit_price']*$data['qty']);
+                                $tot_tagihan = $tot_tagihan + (($data['unit_price']*$data['qty']) - $data['discount']);
                             }
                         }
                         $model2->total_tagihan = $tot_tagihan;
@@ -491,7 +494,7 @@ class TransaksiController extends Controller
                 if (Yii::app()->user->hasState('items_belanja')) {
                     $items = array();
                     foreach (Yii::app()->user->getState('items_belanja') as $index => $data) {
-                        $data['discount'] = Promosi::getDiscountValue($model->id, $data['unit_price']);
+                        $data['discount'] = Promosi::getDiscountValue($model->id, $data['unit_price']) * $data['qty'];
                         $items[$index] = $data;
                     }
                     Yii::app()->user->setState('items_belanja', $items);
